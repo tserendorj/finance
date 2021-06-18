@@ -17,6 +17,25 @@ var uiController = (function(){
         },
         getDOMstring: function(){
             return DOMstrings;
+        },
+
+        addListItem: function(item, type){
+            // create html which creates inc, exp
+            var html, list;
+            if(type === 'inc'){
+                list = '.income__list';
+                html = '<div class="item clearfix" id="income-%id%"><div class="item__description">%DESC%</div><div class="right clearfix"><div class="item__value">%VALUE%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+            } else {
+                list = '.expenses__list';
+                html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%DESC%</div><div class="right clearfix"><div class="item__value">%VALUE%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+            }
+            // Replace the HTML of INC, EXP
+            html = html.replace('%id%', item.id);
+            html = html.replace('%DESC%', item.description);
+            html = html.replace('%VALUE%', item.value);
+            // INSERT the HTML
+            document.querySelector(list).insertAdjacentHTML('beforeend', html);
+
         }
 
     }
@@ -63,6 +82,8 @@ var financeController = (function(){
             }
 
             data.items[type].push(item);
+
+            return item;
         }
     }
 })();
@@ -73,9 +94,9 @@ var appController = (function(uiController, financeController){
         // 1. get value from user interface
         var input = (uiController.getInput());
         // 2. transfer the values to finance controller
-        financeController.addItem(input.type, input.description, input.value);
+        var item = financeController.addItem(input.type, input.description, input.value);
         // 3. display the values on user interface
-
+        uiController.addListItem(item, input.type);
         // 4. calculate budget
 
         // 5. calculate resiudal amount and display
