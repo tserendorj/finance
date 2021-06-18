@@ -10,7 +10,9 @@ var uiController = (function(){
         tusuvLabel: ".budget__value",
         incomeLabel: ".budget__income--value",
         expenseLabel: ".budget__expenses--value",
-        percentageLabel: ".budget__expenses--percentage"
+        percentageLabel: ".budget__expenses--percentage",
+        containerDiv: ".container"
+
     };
     
     return {
@@ -50,15 +52,20 @@ var uiController = (function(){
             
         },
 
+        deleteListItem: function(id){
+            var el = document.getElementById(id);
+            el.parentNode.removeChild(el);
+        },
+
         addListItem: function(item, type){
             // create html which creates inc, exp
             var html, list;
             if(type === 'inc'){
                 list = DOMstrings.incomeList;
-                html = '<div class="item clearfix" id="income-%id%"><div class="item__description">%DESC%</div><div class="right clearfix"><div class="item__value">%VALUE%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+                html = '<div class="item clearfix" id="inc-%id%"><div class="item__description">%DESC%</div><div class="right clearfix"><div class="item__value">%VALUE%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
             } else {
                 list = DOMstrings.expenseList;
-                html = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%DESC%</div><div class="right clearfix"><div class="item__value">%VALUE%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+                html = '<div class="item clearfix" id="exp-%id%"><div class="item__description">%DESC%</div><div class="right clearfix"><div class="item__value">%VALUE%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
             }
             // Replace the HTML of INC, EXP
             html = html.replace('%id%', item.id);
@@ -128,6 +135,20 @@ var financeController = (function(){
                 totalExp: data.totals.exp
             }
         },
+
+        deleteItem: function(type, id){
+            var ids = data.items[type].map(function(el){
+                return el.id;
+            });
+
+            var index = ids.indexOf(id);
+
+            if(index !== -1){
+                data.items[type].splice(index, 1);
+            }
+
+        },
+
         addItem: function(type, desc, val){
             var item, id;
 
@@ -185,6 +206,21 @@ var appController = (function(uiController, financeController){
                 ctrlAddItem();
             };
         });
+
+        document.querySelector(DOM.containerDiv).addEventListener('click', function(event){
+            var id = event.target.parentNode.parentNode.parentNode.parentNode.id;
+            if (id){
+                var arr = id.split('-');
+                var type = arr[0];
+                var itemId = parseInt(arr[1]);
+
+                // delete from finance module
+                financeController.deleteItem(type, itemId)
+                // delete from display
+                uiController.deleteListItem(id);
+                // refresh the budget
+            }
+        })
     };
 
     return {
