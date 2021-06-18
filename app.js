@@ -37,7 +37,7 @@ var financeController = (function(){
     };
 
     var data = {
-        allItems: {
+        items: {
             inc:[],
             exp:[]
         },
@@ -46,15 +46,34 @@ var financeController = (function(){
             exp: 0
         }
     }
+
+    return {
+        addItem: function(type, desc, val){
+            var item, id;
+
+            if(data.items[type].length === 0) id = 1;
+            else {
+                data.items[type][data.items[type].length - 1].id + 1
+            }
+
+            if(type === 'inc'){
+                item = new Income(id, desc, val)
+            } else {
+                item = new Expense(id, desc, val)
+            }
+
+            data.items[type].push(item);
+        }
+    }
 })();
 // controller for con
 var appController = (function(uiController, financeController){
 
     var ctrlAddItem = function(){
         // 1. get value from user interface
-        console.log(uiController.getInput())
+        var input = (uiController.getInput());
         // 2. transfer the values to finance controller
-
+        financeController.addItem(input.type, input.description, input.value);
         // 3. display the values on user interface
 
         // 4. calculate budget
